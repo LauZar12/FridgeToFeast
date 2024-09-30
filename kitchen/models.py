@@ -23,3 +23,12 @@ class Ingredient(models.Model):
 class RecipeHadIngredient(models.Model):
     recipe_id = models.ForeignKey(Recipe, on_delete=models.DO_NOTHING)
     ingredient_name = models.CharField(max_length=100)
+
+
+class IngredientService:
+    def create_ingredient(self, name, quantity, unit, user):
+        if not name:
+            raise ValueError("Name is required")
+        ingredient = Ingredient(name=name, quantity=quantity, unit=unit, user=user)
+        ingredient.save()
+        return ingredient

@@ -2,7 +2,7 @@ from django.shortcuts import render
 
 from django.shortcuts import render, redirect
 from django.urls import reverse
-from .models import Ingredient
+from .models import Ingredient, IngredientService
 from .forms import RecipeForm, IngredientForm
 from django.contrib.auth.decorators import login_required
 from django.shortcuts import render, redirect, get_object_or_404
@@ -23,18 +23,20 @@ def list_ingredients(request):
     return render(request, "list_ingredients.html", {"ingredients": ingredients})
 
 @login_required
-def create_ingredient(request):
+def create_ingredient(request, ingredient_service=IngredientService()):
     if request.method == "POST":
         new_name = request.POST.get("name")
         quantity = request.POST.get("quantity")
         unit = request.POST.get("unit")
-        if new_name == "":
-            ingredients = Ingredient.objects.all()
+
+        try:
+            ingredient_service.create_ingredient(new_name, quantity, unit, request.user)
+        except ValueError as e:
+            ingredients = Ingredient.objects.filter(user=request.user)
             return render(
-                request, "list_ingredients.html", {"ingredients": ingredients, "error": "Title and description is required"}
+                request, "list_ingredients.html", {"ingredients": ingredients, "error": str(e)}
             )
-        ingredient = Ingredient(name=new_name, user=request.user, quantity=quantity, unit=unit)
-        ingredient.save()
+
         return redirect("/kitchen/")
     else:
         return redirect("/kitchen/")
