@@ -22,6 +22,7 @@ from kitchen import views as kitchen_views
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('', kitchen_views.index, name='home'),
+
     path('kitchen/', include('kitchen.urls')),
     path('user/', include('user.urls')),
     path('kitchen/statistics/', include('statistic.urls')),
